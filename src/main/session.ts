@@ -1,8 +1,18 @@
-import { spawn, ChildProcess } from 'child_process'
+import { spawn, execFileSync, ChildProcess } from 'child_process'
 import { EventEmitter } from 'events'
 import { randomUUID } from 'crypto'
 import { parseStream } from './parser'
 import type { ClaudeEvent, Session, SessionStatus } from '../shared/types'
+
+function resolveClaude(): string {
+  try {
+    return execFileSync('/bin/zsh', ['-lc', 'which claude'], { encoding: 'utf8' }).trim()
+  } catch {
+    return 'claude'
+  }
+}
+
+const CLAUDE_BIN = resolveClaude()
 
 type SessionState = Omit<Session, never> & { currentProc?: ChildProcess; buffer: string }
 
@@ -42,15 +52,9 @@ export class SessionManager extends EventEmitter {
     state.buffer = ''
     this.setStatus(state, 'loading')
 
-    const home = process.env.HOME ?? ''
-    const env = {
-      ...process.env,
-      PATH: `/usr/local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${home}/.local/bin:${process.env.PATH ?? ''}`,
-    }
-
-    const proc = spawn('claude', args, {
+    const proc = spawn(CLAUDE_BIN, args, {
       cwd: state.workingDir,
-      env,
+      env: { ...process.env },
     })
     state.currentProc = proc
 

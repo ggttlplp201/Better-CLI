@@ -1,15 +1,26 @@
 import { spawn, execFileSync, ChildProcess } from 'child_process'
+import { existsSync } from 'fs'
+import { join } from 'path'
 import { EventEmitter } from 'events'
 import { randomUUID } from 'crypto'
 import { parseStream } from './parser'
 import type { ClaudeEvent, Session, SessionStatus } from '../shared/types'
 
 function resolveClaude(): string {
-  try {
-    return execFileSync('/bin/zsh', ['-lc', 'which claude'], { encoding: 'utf8' }).trim()
-  } catch {
-    return 'claude'
+  const home = process.env.HOME ?? ''
+  const candidates = [
+    join(home, '.local/bin/claude'),
+    '/usr/local/bin/claude',
+    '/opt/homebrew/bin/claude',
+  ]
+  for (const p of candidates) {
+    if (existsSync(p)) return p
   }
+  try {
+    const r = execFileSync('/bin/zsh', ['-lc', 'which claude'], { encoding: 'utf8' }).trim()
+    if (r) return r
+  } catch {}
+  return 'claude'
 }
 
 const CLAUDE_BIN = resolveClaude()

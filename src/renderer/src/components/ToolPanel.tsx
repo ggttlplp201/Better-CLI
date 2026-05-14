@@ -51,6 +51,9 @@ export function ToolPanel({ toolCalls }: Props): React.JSX.Element {
               <div className="text-gray-500 truncate">
                 {Object.entries(tc.input)[0]?.[1] as string ?? ''}
               </div>
+              {tc.result && (
+                <div className="text-gray-600 truncate">{tc.result.slice(0, 80)}</div>
+              )}
               {tc.endedAt && (
                 <div className="text-gray-600">{tc.endedAt - tc.startedAt}ms</div>
               )}

@@ -1,7 +1,13 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, net, protocol } from 'electron'
 import { join } from 'path'
+import { pathToFileURL } from 'url'
 import { SessionManager } from './session'
 import { registerIpc } from './ipc'
+
+// Register custom scheme before app is ready so ES modules get a real origin
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true, stream: true } }
+])
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -22,7 +28,7 @@ function createWindow(): BrowserWindow {
     win.loadURL(process.env.ELECTRON_RENDERER_URL)
     win.webContents.openDevTools()
   } else {
-    win.loadFile(join(__dirname, '../renderer/index.html'))
+    win.loadURL('app://localhost/index.html')
   }
 
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -34,6 +40,14 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
+  // Serve renderer files via app:// so type="module" scripts get a proper origin
+  protocol.handle('app', (request) => {
+    const url = new URL(request.url)
+    const rendererRoot = join(__dirname, '../renderer')
+    const filePath = join(rendererRoot, url.pathname)
+    return net.fetch(pathToFileURL(filePath).toString())
+  })
+
   const manager = new SessionManager()
   const win = createWindow()
   registerIpc(manager, win)

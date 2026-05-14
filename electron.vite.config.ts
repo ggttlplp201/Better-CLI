@@ -9,7 +9,7 @@ const fixElectronScript: Plugin = {
   name: 'fix-electron-script',
   transformIndexHtml: (html) =>
     html
-      .replace(/<script type="module" crossorigin/g, '<script')
+      .replace(/<script type="module" crossorigin/g, '<script defer')
       .replace(/ crossorigin/g, ''),
 }
 

@@ -49,7 +49,7 @@ export function ToolPanel({ toolCalls }: Props): React.JSX.Element {
                 {tc.status === 'running' ? '⟳' : tc.status === 'success' ? '✓' : '✗'} {tc.name}
               </div>
               <div className="text-gray-500 truncate">
-                {Object.entries(tc.input)[0]?.[1] as string ?? ''}
+                {String(Object.entries(tc.input)[0]?.[1] ?? '')}
               </div>
               {tc.result && (
                 <div className="text-gray-600 truncate">{tc.result.slice(0, 80)}</div>

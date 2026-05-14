@@ -13,7 +13,7 @@ export function SessionSidebar({ sessions, activeId, onSelect, onNew }: Props): 
 
   return (
     <aside className="w-44 flex-shrink-0 bg-panel border-r border-border flex flex-col">
-      <div className="flex items-center justify-between px-3 py-3 border-b border-border">
+      <div className="flex items-center justify-between px-3 py-3 border-b border-border pl-16">
         <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Sessions</span>
         <button
           onClick={onNew}

@@ -1,4 +1,4 @@
-import { app, BrowserWindow, shell } from 'electron'
+import { app, BrowserWindow, shell, globalShortcut } from 'electron'
 import { join } from 'path'
 import { SessionManager } from './session'
 import { registerIpc } from './ipc'
@@ -37,6 +37,10 @@ app.whenReady().then(() => {
   const manager = new SessionManager()
   const win = createWindow()
   registerIpc(manager, win)
+
+  globalShortcut.register('CommandOrControl+Option+I', () => {
+    win.webContents.toggleDevTools()
+  })
 })
 
 app.on('window-all-closed', () => {

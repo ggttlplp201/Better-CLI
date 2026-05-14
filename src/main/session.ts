@@ -70,6 +70,13 @@ export class SessionManager extends EventEmitter {
     })
     state.currentProc = proc
 
+    proc.on('error', (err) => {
+      state.currentProc = undefined
+      this.setStatus(state, 'active')
+      const errEvent: ClaudeEvent = { type: 'error', error: { message: `Failed to start Claude: ${err.message}` } }
+      this.emit('event', sessionId, errEvent)
+    })
+
     let stderrAccum = ''
 
     proc.stdout.on('data', (chunk: Buffer) => {

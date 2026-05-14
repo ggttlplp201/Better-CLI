@@ -2,6 +2,9 @@ import { app, BrowserWindow, shell, globalShortcut } from 'electron'
 import { join } from 'path'
 import { SessionManager } from './session'
 import { registerIpc } from './ipc'
+import { IPC } from '../shared/types'
+
+const manager = new SessionManager()
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -30,13 +33,26 @@ function createWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
+  const onEvent = (sessionId: string, event: unknown) => {
+    if (!win.isDestroyed()) win.webContents.send(IPC.SESSION_EVENT, sessionId, event)
+  }
+  const onStatus = (sessionId: string, status: string) => {
+    if (!win.isDestroyed()) win.webContents.send(IPC.SESSION_STATUS, sessionId, status)
+  }
+
+  manager.on('event', onEvent)
+  manager.on('status', onStatus)
+  win.on('closed', () => {
+    manager.off('event', onEvent)
+    manager.off('status', onStatus)
+  })
+
   return win
 }
 
 app.whenReady().then(() => {
-  const manager = new SessionManager()
+  registerIpc(manager)
   const win = createWindow()
-  registerIpc(manager, win)
 
   globalShortcut.register('CommandOrControl+Option+I', () => {
     win.webContents.toggleDevTools()

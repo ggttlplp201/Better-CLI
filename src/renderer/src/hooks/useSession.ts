@@ -7,6 +7,18 @@ export function useSession() {
   const [sessions, setSessions] = useState<SessionStore>({})
   const [activeId, setActiveId] = useState<string | null>(null)
 
+  // Load existing sessions from main process on mount
+  useEffect(() => {
+    window.api.listSessions().then(existing => {
+      if (existing.length === 0) return
+      const store: SessionStore = {}
+      for (const s of existing) store[s.id] = s
+      setSessions(store)
+      const first = existing.find(s => s.status !== 'inactive') ?? existing[0]
+      setActiveId(first.id)
+    })
+  }, [])
+
   // Register IPC listeners once
   useEffect(() => {
     const offEvent = window.api.onEvent((sessionId, event) => {
@@ -108,14 +120,14 @@ function applyEvent(store: SessionStore, sessionId: string, event: ClaudeEvent):
   }
 
   if (event.type === 'user') {
-    // tool results arrive here — mark the matching tool call as success
-    const content = (event.message.content ?? []) as Array<{ type: string; tool_use_id?: string; content?: string }>
+    const content = (event.message.content ?? []) as Array<{ type: string; tool_use_id?: string; content?: string; is_error?: boolean }>
     const results = content.filter(b => b.type === 'tool_result')
     if (!results.length) return store
     const updatedToolCalls = session.toolCalls.map(tc => {
       const result = results.find(r => r.tool_use_id === tc.id)
       if (!result) return tc
-      return { ...tc, result: result.content ?? '', status: 'success' as const, endedAt: Date.now() }
+      const status = result.is_error ? 'error' as const : 'success' as const
+      return { ...tc, result: result.content ?? '', status, endedAt: Date.now() }
     })
     return { ...store, [sessionId]: { ...session, toolCalls: updatedToolCalls } }
   }

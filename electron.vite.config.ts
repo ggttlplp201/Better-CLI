@@ -11,7 +11,7 @@ export default defineConfig({
   renderer: {
     plugins: [react()],
     css: {
-      postcss: './postcss.config.ts'
+      postcss: './postcss.config.js'
     }
   }
 })

@@ -50,13 +50,13 @@ export class SessionManager extends EventEmitter {
     return Array.from(this.sessions.values()).map(s => this.toSession(s))
   }
 
-  send(sessionId: string, text: string): void {
+  send(sessionId: string, text: string, retryWithoutResume = false): void {
     const state = this.sessions.get(sessionId)
     if (!state) throw new Error(`Session ${sessionId} not found`)
     if (state.status === 'loading') throw new Error(`Session ${sessionId} is busy`)
 
     const args = ['--print', text, '--output-format', 'stream-json', '--verbose']
-    if (state.claudeSessionId) {
+    if (state.claudeSessionId && !retryWithoutResume) {
       args.push('--resume', state.claudeSessionId)
     }
 
@@ -70,6 +70,8 @@ export class SessionManager extends EventEmitter {
     })
     state.currentProc = proc
 
+    let stderrAccum = ''
+
     proc.stdout.on('data', (chunk: Buffer) => {
       const { events, remaining } = parseStream(chunk.toString(), state.buffer)
       state.buffer = remaining
@@ -82,16 +84,25 @@ export class SessionManager extends EventEmitter {
     })
 
     proc.stderr.on('data', (chunk: Buffer) => {
-      // surface stderr as an error event so the UI can show it
-      const msg = chunk.toString().trim()
-      if (msg) {
-        const errEvent: ClaudeEvent = { type: 'error', error: { message: msg } }
-        this.emit('event', sessionId, errEvent)
-      }
+      stderrAccum += chunk.toString()
     })
 
     proc.on('exit', () => {
       state.currentProc = undefined
+
+      const msg = stderrAccum.trim()
+      if (msg) {
+        // If the session ID we tried to resume no longer exists, clear it and retry fresh
+        if (msg.includes('No conversation found with session ID')) {
+          state.claudeSessionId = undefined
+          this.setStatus(state, 'active')
+          this.send(sessionId, text, true)
+          return
+        }
+        const errEvent: ClaudeEvent = { type: 'error', error: { message: msg } }
+        this.emit('event', sessionId, errEvent)
+      }
+
       this.setStatus(state, 'active')
     })
   }

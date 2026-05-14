@@ -1,23 +1,7 @@
-import { app, BrowserWindow, shell, protocol } from 'electron'
-import { join, extname } from 'path'
-import { promises as fs } from 'fs'
+import { app, BrowserWindow, shell } from 'electron'
+import { join } from 'path'
 import { SessionManager } from './session'
 import { registerIpc } from './ipc'
-
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true, stream: true } }
-])
-
-const MIME: Record<string, string> = {
-  '.html': 'text/html',
-  '.js':   'application/javascript',
-  '.mjs':  'application/javascript',
-  '.css':  'text/css',
-  '.json': 'application/json',
-  '.png':  'image/png',
-  '.svg':  'image/svg+xml',
-  '.wasm': 'application/wasm',
-}
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -38,7 +22,7 @@ function createWindow(): BrowserWindow {
     win.loadURL(process.env.ELECTRON_RENDERER_URL)
     win.webContents.openDevTools()
   } else {
-    win.loadURL('app://localhost/index.html')
+    win.loadFile(join(__dirname, '../renderer/index.html'))
   }
 
   win.webContents.setWindowOpenHandler(({ url }) => {
@@ -50,20 +34,6 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  const rendererRoot = join(__dirname, '../renderer')
-
-  protocol.handle('app', async (request) => {
-    const { pathname } = new URL(request.url)
-    const filePath = join(rendererRoot, pathname)
-    try {
-      const data = await fs.readFile(filePath)
-      const contentType = MIME[extname(filePath)] ?? 'application/octet-stream'
-      return new Response(data, { headers: { 'content-type': contentType } })
-    } catch {
-      return new Response('not found', { status: 404 })
-    }
-  })
-
   const manager = new SessionManager()
   const win = createWindow()
   registerIpc(manager, win)

@@ -2,7 +2,7 @@
 
 A native macOS desktop app that wraps the Claude Code CLI in a proper UI. Three-panel layout: session sidebar, chat area, and tool call viewer. Full slash command support with autocomplete.
 
-![screenshot placeholder](docs/screenshot.png)
+<img width="1271" height="922" alt="Screenshot 2026-05-14 at 11 00 00 AM" src="https://github.com/user-attachments/assets/6578c748-5f55-46ae-8799-e1c0af2c952e" />
 
 ## Features
 

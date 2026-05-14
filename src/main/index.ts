@@ -1,13 +1,23 @@
-import { app, BrowserWindow, shell, net, protocol } from 'electron'
-import { join } from 'path'
-import { pathToFileURL } from 'url'
+import { app, BrowserWindow, shell, protocol } from 'electron'
+import { join, extname } from 'path'
+import { promises as fs } from 'fs'
 import { SessionManager } from './session'
 import { registerIpc } from './ipc'
 
-// Register custom scheme before app is ready so ES modules get a real origin
 protocol.registerSchemesAsPrivileged([
   { scheme: 'app', privileges: { secure: true, standard: true, supportFetchAPI: true, stream: true } }
 ])
+
+const MIME: Record<string, string> = {
+  '.html': 'text/html',
+  '.js':   'application/javascript',
+  '.mjs':  'application/javascript',
+  '.css':  'text/css',
+  '.json': 'application/json',
+  '.png':  'image/png',
+  '.svg':  'image/svg+xml',
+  '.wasm': 'application/wasm',
+}
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -40,12 +50,18 @@ function createWindow(): BrowserWindow {
 }
 
 app.whenReady().then(() => {
-  // Serve renderer files via app:// so type="module" scripts get a proper origin
-  protocol.handle('app', (request) => {
-    const url = new URL(request.url)
-    const rendererRoot = join(__dirname, '../renderer')
-    const filePath = join(rendererRoot, url.pathname)
-    return net.fetch(pathToFileURL(filePath).toString())
+  const rendererRoot = join(__dirname, '../renderer')
+
+  protocol.handle('app', async (request) => {
+    const { pathname } = new URL(request.url)
+    const filePath = join(rendererRoot, pathname)
+    try {
+      const data = await fs.readFile(filePath)
+      const contentType = MIME[extname(filePath)] ?? 'application/octet-stream'
+      return new Response(data, { headers: { 'content-type': contentType } })
+    } catch {
+      return new Response('not found', { status: 404 })
+    }
   })
 
   const manager = new SessionManager()

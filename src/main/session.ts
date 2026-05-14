@@ -42,9 +42,15 @@ export class SessionManager extends EventEmitter {
     state.buffer = ''
     this.setStatus(state, 'loading')
 
+    const home = process.env.HOME ?? ''
+    const env = {
+      ...process.env,
+      PATH: `/usr/local/bin:/opt/homebrew/bin:/opt/homebrew/sbin:${home}/.local/bin:${process.env.PATH ?? ''}`,
+    }
+
     const proc = spawn('claude', args, {
       cwd: state.workingDir,
-      env: { ...process.env },
+      env,
     })
     state.currentProc = proc
 

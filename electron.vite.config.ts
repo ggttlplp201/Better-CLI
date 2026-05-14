@@ -24,6 +24,14 @@ export default defineConfig({
     plugins: [react(), fixElectronScript],
     css: {
       postcss: './postcss.config.js'
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          format: 'iife',
+          inlineDynamicImports: true,
+        }
+      }
     }
   }
 })

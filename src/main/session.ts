@@ -66,6 +66,7 @@ export class SessionManager extends EventEmitter {
     const proc = spawn(CLAUDE_BIN, args, {
       cwd: state.workingDir,
       env: { ...process.env },
+      stdio: ['ignore', 'pipe', 'pipe'],
     })
     state.currentProc = proc
 

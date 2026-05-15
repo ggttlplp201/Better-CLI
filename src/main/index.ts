@@ -1,10 +1,12 @@
 import { app, BrowserWindow, shell, globalShortcut } from 'electron'
 import { join } from 'path'
 import { SessionManager } from './session'
+import { PtyManager } from './pty'
 import { registerIpc } from './ipc'
 import { IPC } from '../shared/types'
 
-const manager = new SessionManager()
+const manager = new SessionManager(join(app.getPath('userData'), 'sessions.json'))
+const ptyManager = new PtyManager()
 
 function createWindow(): BrowserWindow {
   const win = new BrowserWindow({
@@ -33,6 +35,7 @@ function createWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
+  // Forward session events to this window
   const onEvent = (sessionId: string, event: unknown) => {
     if (!win.isDestroyed()) win.webContents.send(IPC.SESSION_EVENT, sessionId, event)
   }
@@ -40,18 +43,31 @@ function createWindow(): BrowserWindow {
     if (!win.isDestroyed()) win.webContents.send(IPC.SESSION_STATUS, sessionId, status)
   }
 
+  // Forward PTY output to this window
+  const onPtyData = (sessionId: string, data: string) => {
+    if (!win.isDestroyed()) win.webContents.send(IPC.PTY_DATA, sessionId, data)
+  }
+  const onPtyExit = (sessionId: string, code: number) => {
+    if (!win.isDestroyed()) win.webContents.send(IPC.PTY_EXIT, sessionId, code)
+  }
+
   manager.on('event', onEvent)
   manager.on('status', onStatus)
+  ptyManager.on('data', onPtyData)
+  ptyManager.on('exit', onPtyExit)
+
   win.on('closed', () => {
     manager.off('event', onEvent)
     manager.off('status', onStatus)
+    ptyManager.off('data', onPtyData)
+    ptyManager.off('exit', onPtyExit)
   })
 
   return win
 }
 
 app.whenReady().then(() => {
-  registerIpc(manager)
+  registerIpc(manager, ptyManager)
   const win = createWindow()
 
   globalShortcut.register('CommandOrControl+Option+I', () => {
@@ -60,6 +76,7 @@ app.whenReady().then(() => {
 })
 
 app.on('window-all-closed', () => {
+  ptyManager.killAll()
   if (process.platform !== 'darwin') app.quit()
 })
 

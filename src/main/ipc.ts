@@ -2,8 +2,9 @@ import { ipcMain, dialog, BrowserWindow } from 'electron'
 import { IPC } from '../shared/types'
 import type { PermissionMode } from '../shared/types'
 import type { SessionManager } from './session'
+import type { PtyManager } from './pty'
 
-export function registerIpc(manager: SessionManager): void {
+export function registerIpc(manager: SessionManager, ptyManager: PtyManager): void {
   ipcMain.handle(IPC.FOLDER_PICK, async () => {
     const win = BrowserWindow.getFocusedWindow()
     const result = await dialog.showOpenDialog(win!, {
@@ -35,5 +36,30 @@ export function registerIpc(manager: SessionManager): void {
 
   ipcMain.on(IPC.SESSION_SET_PERMISSION, (_e, sessionId: string, mode: PermissionMode) => {
     manager.setPermissionMode(sessionId, mode)
+  })
+
+  // PTY handlers
+  ipcMain.handle(IPC.PTY_SPAWN, (_e, sessionId: string, cwd: string, cols: number, rows: number) => {
+    ptyManager.spawn(sessionId, cwd, cols, rows)
+  })
+
+  ipcMain.on(IPC.PTY_INPUT, (_e, sessionId: string, data: string) => {
+    ptyManager.write(sessionId, data)
+  })
+
+  ipcMain.on(IPC.PTY_RESIZE, (_e, sessionId: string, cols: number, rows: number) => {
+    ptyManager.resize(sessionId, cols, rows)
+  })
+
+  ipcMain.on(IPC.PTY_KILL, (_e, sessionId: string) => {
+    ptyManager.kill(sessionId)
+  })
+
+  ipcMain.handle(IPC.PTY_SCROLLBACK, (_e, sessionId: string) => {
+    return ptyManager.getScrollback(sessionId)
+  })
+
+  ipcMain.handle(IPC.PTY_IS_ALIVE, (_e, sessionId: string) => {
+    return ptyManager.isAlive(sessionId)
   })
 }

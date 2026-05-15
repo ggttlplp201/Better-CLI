@@ -37,4 +37,37 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.on(IPC.SESSION_STATUS, handler)
     return () => ipcRenderer.off(IPC.SESSION_STATUS, handler)
   },
+
+  // PTY (interactive terminal)
+  ptySpawn: (sessionId: string, cwd: string, cols: number, rows: number): Promise<void> =>
+    ipcRenderer.invoke(IPC.PTY_SPAWN, sessionId, cwd, cols, rows),
+
+  ptyInput: (sessionId: string, data: string): void =>
+    ipcRenderer.send(IPC.PTY_INPUT, sessionId, data),
+
+  ptyResize: (sessionId: string, cols: number, rows: number): void =>
+    ipcRenderer.send(IPC.PTY_RESIZE, sessionId, cols, rows),
+
+  ptyKill: (sessionId: string): void =>
+    ipcRenderer.send(IPC.PTY_KILL, sessionId),
+
+  ptyScrollback: (sessionId: string): Promise<string> =>
+    ipcRenderer.invoke(IPC.PTY_SCROLLBACK, sessionId),
+
+  ptyIsAlive: (sessionId: string): Promise<boolean> =>
+    ipcRenderer.invoke(IPC.PTY_IS_ALIVE, sessionId),
+
+  onPtyData: (cb: (sessionId: string, data: string) => void) => {
+    const handler = (_: Electron.IpcRendererEvent, sessionId: string, data: string) =>
+      cb(sessionId, data)
+    ipcRenderer.on(IPC.PTY_DATA, handler)
+    return () => ipcRenderer.off(IPC.PTY_DATA, handler)
+  },
+
+  onPtyExit: (cb: (sessionId: string, code: number) => void) => {
+    const handler = (_: Electron.IpcRendererEvent, sessionId: string, code: number) =>
+      cb(sessionId, code)
+    ipcRenderer.on(IPC.PTY_EXIT, handler)
+    return () => ipcRenderer.off(IPC.PTY_EXIT, handler)
+  },
 })

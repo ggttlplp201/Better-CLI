@@ -94,6 +94,20 @@ export function useSession() {
     })
   }, [])
 
+  const deleteSession = useCallback((sessionId: string) => {
+    window.api.deleteSession(sessionId)
+    setSessions(prev => {
+      const next = { ...prev }
+      delete next[sessionId]
+      return next
+    })
+    setActiveId(prev => {
+      if (prev !== sessionId) return prev
+      const remaining = Object.keys(sessions).filter(id => id !== sessionId)
+      return remaining[0] ?? null
+    })
+  }, [sessions])
+
   const activeSession = activeId ? sessions[activeId] : null
 
   return {
@@ -106,6 +120,7 @@ export function useSession() {
     stopSession,
     resumeSession,
     setPermissionMode,
+    deleteSession,
   }
 }
 

@@ -64,6 +64,7 @@ export const IPC = {
   SESSION_EVENT: 'session:event',
   SESSION_STATUS: 'session:status',
   SESSION_SET_PERMISSION: 'session:set-permission',
+  SESSION_DELETE: 'session:delete',
   FOLDER_PICK: 'folder:pick',
   // PTY (interactive terminal) channels
   PTY_SPAWN: 'pty:spawn',

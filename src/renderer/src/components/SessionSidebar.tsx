@@ -6,9 +6,10 @@ type Props = {
   activeId: string | null
   onSelect: (id: string) => void
   onNew: () => void
+  onDelete: (id: string) => void
 }
 
-export function SessionSidebar({ sessions, activeId, onSelect, onNew }: Props): React.JSX.Element {
+export function SessionSidebar({ sessions, activeId, onSelect, onNew, onDelete }: Props): React.JSX.Element {
   const sorted = [...sessions].sort((a, b) => b.createdAt - a.createdAt)
 
   return (
@@ -31,31 +32,41 @@ export function SessionSidebar({ sessions, activeId, onSelect, onNew }: Props): 
           </p>
         )}
         {sorted.map(session => (
-          <button
-            key={session.id}
-            onClick={() => onSelect(session.id)}
-            className={`w-full text-left px-3 py-2 rounded mx-1 transition-colors ${
-              session.id === activeId
-                ? 'bg-border text-white border-l-2 border-accent'
-                : 'text-gray-400 hover:text-white hover:bg-border/50'
-            }`}
-          >
-            <div className="flex items-center gap-1.5">
-              {session.status === 'active' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
-              )}
-              {session.status === 'loading' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0 animate-pulse" />
-              )}
-              {session.status === 'inactive' && (
-                <span className="w-1.5 h-1.5 rounded-full bg-gray-600 flex-shrink-0" />
-              )}
-              <span className="text-xs truncate">{session.name}</span>
-            </div>
-            <div className="text-xs text-gray-600 mt-0.5 pl-3">
-              {new Date(session.createdAt).toLocaleDateString()}
-            </div>
-          </button>
+          <div key={session.id} className="group relative mx-1">
+            <button
+              onClick={() => onSelect(session.id)}
+              className={`w-full text-left px-3 py-2 pr-7 rounded transition-colors ${
+                session.id === activeId
+                  ? 'bg-border text-white border-l-2 border-accent'
+                  : 'text-gray-400 hover:text-white hover:bg-border/50'
+              }`}
+            >
+              <div className="flex items-center gap-1.5">
+                {session.status === 'active' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
+                )}
+                {session.status === 'loading' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0 animate-pulse" />
+                )}
+                {session.status === 'inactive' && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-600 flex-shrink-0" />
+                )}
+                <span className="text-xs truncate">{session.name}</span>
+              </div>
+              <div className="text-xs text-gray-600 mt-0.5 pl-3">
+                {new Date(session.createdAt).toLocaleDateString()}
+              </div>
+            </button>
+
+            {/* Delete button — revealed on row hover */}
+            <button
+              onClick={e => { e.stopPropagation(); onDelete(session.id) }}
+              title="Delete session"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 hover:text-red-400 w-4 h-4 flex items-center justify-center rounded"
+            >
+              ×
+            </button>
+          </div>
         ))}
       </div>
     </aside>

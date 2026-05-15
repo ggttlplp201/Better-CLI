@@ -38,6 +38,10 @@ export function registerIpc(manager: SessionManager, ptyManager: PtyManager): vo
     manager.setPermissionMode(sessionId, mode)
   })
 
+  ipcMain.on(IPC.SESSION_DELETE, (_e, sessionId: string) => {
+    manager.delete(sessionId)
+  })
+
   // PTY handlers
   ipcMain.handle(IPC.PTY_SPAWN, (_e, sessionId: string, cwd: string, cols: number, rows: number) => {
     ptyManager.spawn(sessionId, cwd, cols, rows)

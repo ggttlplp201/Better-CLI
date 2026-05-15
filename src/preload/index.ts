@@ -24,6 +24,9 @@ contextBridge.exposeInMainWorld('api', {
   setPermissionMode: (sessionId: string, mode: PermissionMode): void =>
     ipcRenderer.send(IPC.SESSION_SET_PERMISSION, sessionId, mode),
 
+  deleteSession: (sessionId: string): void =>
+    ipcRenderer.send(IPC.SESSION_DELETE, sessionId),
+
   onEvent: (cb: (sessionId: string, event: ClaudeEvent) => void) => {
     const handler = (_: Electron.IpcRendererEvent, sessionId: string, event: ClaudeEvent) =>
       cb(sessionId, event)

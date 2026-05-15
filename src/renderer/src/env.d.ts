@@ -10,6 +10,7 @@ declare global {
       stopSession: (sessionId: string) => void
       resumeSession: (sessionId: string) => void
       setPermissionMode: (sessionId: string, mode: PermissionMode) => void
+      deleteSession: (sessionId: string) => void
       onEvent: (cb: (sessionId: string, event: ClaudeEvent) => void) => () => void
       onStatus: (cb: (sessionId: string, status: SessionStatus) => void) => () => void
       // PTY (interactive terminal)

@@ -177,6 +177,14 @@ export class SessionManager extends EventEmitter {
     this.setStatus(state, 'active')
   }
 
+  delete(sessionId: string): void {
+    const state = this.sessions.get(sessionId)
+    if (!state) return
+    if (state.currentProc) state.currentProc.kill('SIGINT')
+    this.sessions.delete(sessionId)
+    this.persist()
+  }
+
   setPermissionMode(sessionId: string, mode: PermissionMode): void {
     const state = this.sessions.get(sessionId)
     if (!state) return

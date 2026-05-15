@@ -28,6 +28,7 @@ export function App(): React.JSX.Element {
     stopSession,
     resumeSession,
     setPermissionMode,
+    deleteSession,
   } = useSession()
 
   // view is per-app; switching sessions resets to chat
@@ -52,6 +53,7 @@ export function App(): React.JSX.Element {
           activeId={activeId}
           onSelect={handleSelect}
           onNew={createSession}
+          onDelete={deleteSession}
         />
 
         <main className="flex flex-col flex-1 min-w-0">

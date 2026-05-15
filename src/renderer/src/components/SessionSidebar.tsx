@@ -58,11 +58,11 @@ export function SessionSidebar({ sessions, activeId, onSelect, onNew, onDelete }
               </div>
             </button>
 
-            {/* Delete button — revealed on row hover */}
+            {/* Delete button — always visible, brightens red on hover */}
             <button
               onClick={e => { e.stopPropagation(); onDelete(session.id) }}
               title="Delete session"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity text-gray-600 hover:text-red-400 w-4 h-4 flex items-center justify-center rounded"
+              className="absolute right-1.5 top-1/2 -translate-y-1/2 transition-colors text-gray-700 hover:text-red-400 w-4 h-4 flex items-center justify-center rounded text-sm"
             >
               ×
             </button>

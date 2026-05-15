@@ -1,5 +1,6 @@
 import { ipcMain, dialog, BrowserWindow } from 'electron'
 import { IPC } from '../shared/types'
+import type { PermissionMode } from '../shared/types'
 import type { SessionManager } from './session'
 
 export function registerIpc(manager: SessionManager): void {
@@ -30,5 +31,9 @@ export function registerIpc(manager: SessionManager): void {
 
   ipcMain.on(IPC.SESSION_RESUME, (_e, sessionId: string) => {
     manager.resume(sessionId)
+  })
+
+  ipcMain.on(IPC.SESSION_SET_PERMISSION, (_e, sessionId: string, mode: PermissionMode) => {
+    manager.setPermissionMode(sessionId, mode)
   })
 }

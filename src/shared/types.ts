@@ -10,8 +10,9 @@ export type ClaudeEvent =
   | { type: 'user'; message: { content: unknown[] } }
   | { type: 'result'; subtype: 'success' | 'error'; result: string; session_id: string; cost_usd?: number }
   | { type: 'error'; error: { message: string } }
+  | { type: 'canceled'; message: string }
 
-export type ToolCallStatus = 'running' | 'success' | 'error'
+export type ToolCallStatus = 'running' | 'success' | 'error' | 'canceled'
 
 export type ToolCall = {
   id: string
@@ -33,12 +34,21 @@ export type Message = {
 
 export type SessionStatus = 'active' | 'inactive' | 'loading'
 
+// How Claude handles tool permission prompts for this session.
+// acceptEdits: auto-approve file edits, ask for bash/other (safe default)
+// auto: auto-approve all tool uses without prompting
+// bypassPermissions: skip all checks (unsafe, use in trusted sandboxes only)
+// default: ask for every tool (broken in --print mode; use only for awareness)
+// dontAsk: don't ask but still log
+export type PermissionMode = 'acceptEdits' | 'auto' | 'bypassPermissions' | 'default' | 'dontAsk'
+
 export type Session = {
   id: string
   name: string
   workingDir: string
   status: SessionStatus
   claudeSessionId?: string
+  permissionMode: PermissionMode
   messages: Message[]
   toolCalls: ToolCall[]
   createdAt: number
@@ -53,6 +63,7 @@ export const IPC = {
   SESSION_LIST: 'session:list',
   SESSION_EVENT: 'session:event',
   SESSION_STATUS: 'session:status',
+  SESSION_SET_PERMISSION: 'session:set-permission',
   FOLDER_PICK: 'folder:pick',
 } as const
 

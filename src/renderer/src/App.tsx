@@ -4,6 +4,15 @@ import { SessionSidebar } from './components/SessionSidebar'
 import { ChatArea } from './components/ChatArea'
 import { ToolPanel } from './components/ToolPanel'
 import { InputBar } from './components/InputBar'
+import type { PermissionMode } from '../../shared/types'
+
+const PERMISSION_LABELS: Record<PermissionMode, string> = {
+  acceptEdits: 'accept edits',
+  auto: 'auto-approve all',
+  bypassPermissions: 'bypass all',
+  default: 'ask (interactive)',
+  dontAsk: "don't ask",
+}
 
 export function App(): React.JSX.Element {
   const {
@@ -15,6 +24,7 @@ export function App(): React.JSX.Element {
     sendMessage,
     stopSession,
     resumeSession,
+    setPermissionMode,
   } = useSession()
 
   const handleSelect = (id: string) => {
@@ -43,6 +53,18 @@ export function App(): React.JSX.Element {
               <div className="flex items-center gap-2 px-4 py-2 border-b border-border bg-panel/50 flex-shrink-0">
                 <span className="text-sm font-medium text-gray-300 truncate">{activeSession.name}</span>
                 <span className="text-xs text-gray-600 truncate">{activeSession.workingDir}</span>
+                <div className="ml-auto flex items-center gap-1.5 flex-shrink-0">
+                  <span className="text-xs text-gray-600">permissions:</span>
+                  <select
+                    value={activeSession.permissionMode}
+                    onChange={e => setPermissionMode(activeSession.id, e.target.value as PermissionMode)}
+                    className="text-xs text-gray-400 bg-panel border border-border/60 rounded px-1.5 py-0.5 focus:outline-none focus:border-accent/60 cursor-pointer"
+                  >
+                    {(Object.keys(PERMISSION_LABELS) as PermissionMode[]).map(mode => (
+                      <option key={mode} value={mode}>{PERMISSION_LABELS[mode]}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               <ChatArea messages={activeSession.messages} toolCalls={activeSession.toolCalls} />
               <InputBar

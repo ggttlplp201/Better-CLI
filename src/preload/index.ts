@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer } from 'electron'
 import { IPC } from '../shared/types'
-import type { Session, SessionStatus, ClaudeEvent } from '../shared/types'
+import type { PermissionMode, Session, SessionStatus, ClaudeEvent } from '../shared/types'
 
 contextBridge.exposeInMainWorld('api', {
   pickFolder: (): Promise<string | null> =>
@@ -20,6 +20,9 @@ contextBridge.exposeInMainWorld('api', {
 
   resumeSession: (sessionId: string): void =>
     ipcRenderer.send(IPC.SESSION_RESUME, sessionId),
+
+  setPermissionMode: (sessionId: string, mode: PermissionMode): void =>
+    ipcRenderer.send(IPC.SESSION_SET_PERMISSION, sessionId, mode),
 
   onEvent: (cb: (sessionId: string, event: ClaudeEvent) => void) => {
     const handler = (_: Electron.IpcRendererEvent, sessionId: string, event: ClaudeEvent) =>

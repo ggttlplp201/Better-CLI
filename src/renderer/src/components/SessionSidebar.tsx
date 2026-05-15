@@ -1,5 +1,6 @@
 import React from 'react'
 import type { Session } from '../../../shared/types'
+import { shortenPath } from '../App'
 
 type Props = {
   sessions: Session[]
@@ -13,12 +14,12 @@ export function SessionSidebar({ sessions, activeId, onSelect, onNew, onDelete }
   const sorted = [...sessions].sort((a, b) => b.createdAt - a.createdAt)
 
   return (
-    <aside className="w-44 flex-shrink-0 bg-panel border-r border-border flex flex-col">
-      <div className="flex items-center justify-between px-3 py-3 border-b border-border pl-16">
-        <span className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Sessions</span>
+    <aside className="w-52 flex-shrink-0 bg-white border-r border-gray-200 flex flex-col">
+      <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 pl-16">
+        <span className="text-sm font-semibold text-gray-900">Sessions</span>
         <button
           onClick={onNew}
-          className="text-accent hover:text-white transition-colors text-lg leading-none"
+          className="text-gray-400 hover:text-gray-700 transition-colors text-lg leading-none"
           title="New session"
         >
           +
@@ -27,42 +28,42 @@ export function SessionSidebar({ sessions, activeId, onSelect, onNew, onDelete }
 
       <div className="flex-1 overflow-y-auto py-1">
         {sorted.length === 0 && (
-          <p className="text-xs text-gray-600 px-3 py-4 text-center">
+          <p className="text-xs text-gray-400 px-4 py-4 text-center">
             No sessions yet.{'\n'}Click + to start.
           </p>
         )}
         {sorted.map(session => (
-          <div key={session.id} className="group relative mx-1">
+          <div key={session.id} className="group relative">
             <button
               onClick={() => onSelect(session.id)}
-              className={`w-full text-left px-3 py-2 pr-7 rounded transition-colors ${
+              className={`w-full text-left px-4 py-3 pr-8 transition-colors ${
                 session.id === activeId
-                  ? 'bg-border text-white border-l-2 border-accent'
-                  : 'text-gray-400 hover:text-white hover:bg-border/50'
+                  ? 'bg-gray-50'
+                  : 'hover:bg-gray-50'
               }`}
             >
               <div className="flex items-center gap-1.5">
                 {session.status === 'active' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-400 flex-shrink-0" />
+                  <span className="w-2 h-2 rounded-full bg-green-500 flex-shrink-0" />
                 )}
                 {session.status === 'loading' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 flex-shrink-0 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-yellow-400 flex-shrink-0 animate-pulse" />
                 )}
                 {session.status === 'inactive' && (
-                  <span className="w-1.5 h-1.5 rounded-full bg-gray-600 flex-shrink-0" />
+                  <span className="w-2 h-2 rounded-full border border-gray-300 flex-shrink-0" />
                 )}
-                <span className="text-xs truncate">{session.name}</span>
+                <span className="text-sm font-medium text-gray-900 truncate">{session.name}</span>
               </div>
-              <div className="text-xs text-gray-600 mt-0.5 pl-3">
-                {new Date(session.createdAt).toLocaleDateString()}
+              <div className="text-xs text-gray-400 mt-0.5 pl-[18px] truncate">
+                {shortenPath(session.workingDir)}
               </div>
             </button>
 
-            {/* Delete button — always visible, brightens red on hover */}
+            {/* Delete button */}
             <button
               onClick={e => { e.stopPropagation(); onDelete(session.id) }}
               title="Delete session"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 transition-colors text-gray-700 hover:text-red-400 w-4 h-4 flex items-center justify-center rounded text-sm"
+              className="absolute right-2 top-1/2 -translate-y-1/2 transition-colors text-gray-300 hover:text-red-400 w-5 h-5 flex items-center justify-center rounded text-base"
             >
               ×
             </button>

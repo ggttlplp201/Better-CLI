@@ -6,13 +6,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        surface: '#1e1e1e',
-        panel: '#252526',
-        border: '#3c3c3c',
-        accent: '#6366f1',
-        tool: '#4ec9b0',
-        warn: '#febc2e',
-        danger: '#f44747',
+        surface: '#ffffff',
+        panel: '#fafafa',
+        border: '#e5e7eb',
+        accent: '#111827',
+        tool: '#16a34a',
+        warn: '#d97706',
+        danger: '#dc2626',
       }
     }
   },

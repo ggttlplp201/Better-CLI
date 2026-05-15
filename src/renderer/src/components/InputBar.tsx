@@ -75,25 +75,25 @@ export function InputBar({ status, onSend, onStop }: Props): React.JSX.Element {
   }
 
   return (
-    <div className="px-4 py-3 border-t border-border relative">
+    <div className="bg-white border-t border-gray-200 px-5 py-4 relative">
       {showPopup && (
-        <div className="absolute bottom-full left-4 right-4 mb-1 bg-panel border border-border rounded-lg overflow-hidden shadow-lg">
+        <div className="absolute bottom-full left-5 right-5 mb-1 bg-white border border-gray-200 rounded-xl overflow-hidden shadow-lg">
           {suggestions.map((cmd, i) => (
             <button
               key={cmd.name}
               onMouseDown={e => { e.preventDefault(); pick(cmd.name) }}
               className={`w-full text-left px-3 py-2 flex items-baseline gap-3 transition-colors ${
-                i === selectedIdx ? 'bg-accent/20' : 'hover:bg-border/50'
+                i === selectedIdx ? 'bg-gray-100' : 'hover:bg-gray-50'
               }`}
             >
-              <span className="text-sm font-mono text-accent">{cmd.name}</span>
+              <span className="text-sm font-mono text-gray-900">{cmd.name}</span>
               <span className="text-xs text-gray-500">{cmd.desc}</span>
             </button>
           ))}
         </div>
       )}
 
-      <div className="flex items-end gap-2 bg-panel border border-border rounded-lg p-2">
+      <div className="border border-gray-300 rounded-xl px-4 py-3 bg-white flex items-end gap-2">
         <textarea
           ref={textareaRef}
           value={text}
@@ -102,13 +102,13 @@ export function InputBar({ status, onSend, onStop }: Props): React.JSX.Element {
           placeholder={isLoading ? 'Claude is working...' : 'Message Claude · / for commands'}
           disabled={isLoading}
           rows={1}
-          className="flex-1 bg-transparent text-sm text-gray-200 placeholder-gray-600 resize-none outline-none min-h-[24px] max-h-40 overflow-y-auto disabled:opacity-50"
+          className="flex-1 bg-transparent text-sm text-gray-900 placeholder-gray-400 resize-none outline-none min-h-[24px] max-h-40 overflow-y-auto disabled:opacity-50"
           style={{ fieldSizing: 'content' } as React.CSSProperties}
         />
         {isLoading ? (
           <button
             onClick={onStop}
-            className="flex-shrink-0 px-3 py-1.5 text-xs bg-danger/20 text-danger border border-danger/30 rounded hover:bg-danger/30 transition-colors"
+            className="flex-shrink-0 bg-red-50 text-red-600 border border-red-200 px-3 py-1.5 text-xs rounded-lg hover:bg-red-100 transition-colors"
           >
             Stop
           </button>
@@ -116,13 +116,13 @@ export function InputBar({ status, onSend, onStop }: Props): React.JSX.Element {
           <button
             onClick={submit}
             disabled={!text.trim()}
-            className="flex-shrink-0 px-3 py-1.5 text-xs bg-accent text-white rounded hover:bg-accent/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+            className="flex-shrink-0 bg-gray-900 text-white px-3 py-1.5 text-xs rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Send
           </button>
         )}
       </div>
-      <p className="text-xs text-gray-700 mt-1 pl-1">Enter to send · Shift+Enter for newline</p>
+      <p className="text-xs text-gray-400 mt-2">Enter to send · Shift+Enter for newline</p>
     </div>
   )
 }

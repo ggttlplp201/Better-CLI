@@ -37,6 +37,8 @@ export function ToolPanel({ toolCalls }: Props): React.JSX.Element {
                 ? 'border-tool bg-tool/5 hover:bg-tool/10'
                 : tc.status === 'error'
                 ? 'border-danger bg-danger/5 hover:bg-danger/10'
+                : tc.status === 'canceled'
+                ? 'border-gray-500 bg-gray-500/5 hover:bg-gray-500/10'
                 : 'border-yellow-400 bg-yellow-400/5 hover:bg-yellow-400/10'
             }`}
             onClick={() => toggle(tc.id)}
@@ -44,9 +46,10 @@ export function ToolPanel({ toolCalls }: Props): React.JSX.Element {
             <div className="px-2 py-1.5">
               <div className={`font-medium ${
                 tc.status === 'success' ? 'text-tool' :
-                tc.status === 'error' ? 'text-danger' : 'text-yellow-400'
+                tc.status === 'error' ? 'text-danger' :
+                tc.status === 'canceled' ? 'text-gray-500' : 'text-yellow-400'
               }`}>
-                {tc.status === 'running' ? '⟳' : tc.status === 'success' ? '✓' : '✗'} {tc.name}
+                {tc.status === 'running' ? '...' : tc.status === 'success' ? 'OK' : tc.status === 'canceled' ? 'Stopped' : 'Error'} {tc.name}
               </div>
               <div className="text-gray-500 truncate">
                 {String(Object.entries(tc.input)[0]?.[1] ?? '')}

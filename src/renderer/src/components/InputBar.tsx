@@ -8,38 +8,13 @@ type Props = {
 }
 
 const COMMANDS = [
-  // Built-in Claude Code (work in --print mode)
   { name: '/help',          desc: 'Show available commands and help' },
   { name: '/compact',       desc: 'Compact conversation with a summary' },
-  { name: '/config',        desc: 'Open or edit Claude Code configuration' },
   { name: '/cost',          desc: 'Show token usage and cost for this session' },
-  { name: '/debug',         desc: 'Toggle debug mode' },
   { name: '/init',          desc: 'Initialize Claude Code in current directory' },
-  { name: '/model',         desc: 'Switch the AI model' },
-  { name: '/pr-comments',   desc: 'View pull request comments' },
   { name: '/release-notes', desc: 'View Claude Code release notes' },
   { name: '/review',        desc: 'Request a code review' },
   { name: '/status',        desc: 'Show current session status' },
-  // Codex plugin
-  { name: '/codex:review',             desc: 'Run a Codex code review against local git state' },
-  { name: '/codex:adversarial-review', desc: 'Run a Codex review that challenges your approach' },
-  { name: '/codex:rescue',             desc: 'Delegate investigation or fix to Codex rescue agent' },
-  { name: '/codex:status',             desc: 'Show active and recent Codex jobs' },
-  { name: '/codex:result',             desc: 'Show stored output for a finished Codex job' },
-  { name: '/codex:cancel',             desc: 'Cancel an active background Codex job' },
-  { name: '/codex:setup',              desc: 'Check Codex CLI readiness and toggle review gate' },
-  // Ruflo plugin
-  { name: '/ruflo-core:ruflo-status',       desc: 'Show Ruflo health, MCP server status, and agents' },
-  { name: '/ruflo-docs:ruflo-docs',         desc: 'Generate or update documentation for a file or project' },
-  { name: '/ruflo-memory:ruflo-memory',     desc: 'Memory CRUD: store, search, retrieve, consolidate' },
-  { name: '/ruflo-memory:recall',           desc: 'Quick semantic recall across all memory namespaces' },
-  { name: '/ruflo-testgen:testgen',         desc: 'Generate tests using coverage analysis and TDD patterns' },
-  { name: '/ruflo-security-audit:audit',    desc: 'Run a security audit on the project' },
-  { name: '/ruflo-swarm:swarm',             desc: 'Initialize, monitor, and manage multi-agent swarms' },
-  { name: '/ruflo-swarm:watch',             desc: 'Live-stream swarm events and agent activity' },
-  { name: '/ruflo-loop-workers:ruflo-loop', desc: 'Start a background worker on a recurring schedule' },
-  { name: '/ruflo-autopilot:autopilot',     desc: 'Enable, configure, or disable autonomous task completion' },
-  { name: '/ruflo-autopilot:autopilot-status', desc: 'Quick autopilot progress summary' },
 ]
 
 export function InputBar({ status, onSend, onStop }: Props): React.JSX.Element {

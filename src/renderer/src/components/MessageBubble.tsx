@@ -60,10 +60,12 @@ export function MessageBubble({ message, toolCalls }: Props): React.JSX.Element 
                     ? 'border-tool/40 text-tool bg-tool/10'
                     : tc.status === 'error'
                     ? 'border-danger/40 text-danger bg-danger/10'
+                    : tc.status === 'canceled'
+                    ? 'border-gray-500/40 text-gray-500 bg-gray-500/10'
                     : 'border-yellow-400/40 text-yellow-400 bg-yellow-400/10'
                 }`}
               >
-                {tc.status === 'running' ? '⟳' : tc.status === 'success' ? '✓' : '✗'} {tc.name}
+                {tc.status === 'running' ? '...' : tc.status === 'success' ? 'OK' : tc.status === 'canceled' ? 'Stopped' : 'Error'} {tc.name}
               </span>
             ))}
           </div>

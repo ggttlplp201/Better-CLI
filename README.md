@@ -1,17 +1,25 @@
 # Better CLI — Desktop UI for Claude Code
 
-A native macOS desktop app that wraps the Claude Code CLI in a proper UI. Three-panel layout: session sidebar, chat area, and tool call viewer. Full slash command support with autocomplete.
+A native macOS desktop app that wraps the Claude Code CLI in a proper UI. Three-panel layout with a session sidebar, chat area, and live tool call viewer. Includes a full interactive terminal tab for auth, config, and permission flows.
 
-<img width="1271" height="922" alt="Screenshot 2026-05-14 at 11 00 00 AM" src="https://github.com/user-attachments/assets/6578c748-5f55-46ae-8799-e1c0af2c952e" />
+<img width="1271" height="922" alt="Screenshot 2026-05-14 at 11 00 00 AM" src="https://github.com/user-attachments/assets/6578c748-5f55-46ae-8799-e1c0af2c952e" />
 
 ## Features
 
-- Multiple named sessions with status indicators
-- Streaming responses rendered as Markdown with syntax-highlighted code blocks
-- Tool call panel showing what Claude is doing in real-time
-- Slash command popup (`/`) with all built-in, Codex, and Ruflo plugin commands
+- **Chat tab** — structured Markdown rendering, streaming responses, tool call panel, persisted session history
+- **Terminal tab** — full interactive `claude` session in a real PTY (xterm.js), so auth, `/login`, `/config`, permission prompts, and any TTY-required flow work exactly as in a native terminal
+- Multiple named sessions with status indicators and per-session working directory
+- Slash command autocomplete popup (`/`) covering built-in, Codex, and Ruflo plugin commands
+- Per-session permission mode (accept edits / auto-approve / bypass / ask)
 - Stop button to interrupt mid-response
 - macOS native title bar with traffic light buttons
+- Sessions and chat history persisted across restarts
+
+## How it works
+
+**Chat tab** runs `claude --print --output-format stream-json` and renders structured JSON events as chat bubbles, tool cards, and Markdown. Best for everyday use.
+
+**Terminal tab** spawns `claude` inside a native PTY so Claude thinks it's in a real terminal. Use this when you need to log in, change config, approve permissions interactively, or use any command that doesn't work in `--print` mode. The terminal buffers scrollback, so switching between tabs doesn't lose your session.
 
 ## Requirements
 
@@ -44,20 +52,21 @@ npm run dev
 ## Usage
 
 1. Launch the app
-2. Click **+** in the sidebar to create a new session — it opens in your home directory
-3. Type a message and press **Enter** to send
-4. Press **Shift+Enter** for a newline
-5. Type `/` to open the command autocomplete popup
-6. Press **⌘⌥I** to open DevTools if needed
+2. Click **+** in the sidebar and choose a working directory
+3. Type a message in the **Chat** tab and press **Enter** to send (`Shift+Enter` for newline)
+4. Type `/` to open the slash command autocomplete popup
+5. Switch to the **Terminal** tab for auth, config, or any interactive Claude flow
+6. Use the permission mode dropdown in the header to control how Claude handles tool approvals
+7. Press **⌘⌥I** to open DevTools
 
 ## Project structure
 
 ```
 src/
-  main/         Electron main process (session manager, IPC, claude subprocess)
-  preload/      Context bridge exposing IPC to renderer
-  renderer/     React UI (chat, sidebar, tool panel, input bar)
-  shared/       Shared TypeScript types
+  main/         Electron main process — session manager, PTY manager, IPC
+  preload/      Context bridge exposing IPC to the renderer
+  renderer/     React UI — chat, terminal, sidebar, tool panel, input bar
+  shared/       TypeScript types shared between main and renderer
 ```
 
 ## Tech stack
@@ -65,4 +74,6 @@ src/
 - Electron 34, electron-vite 2
 - React 18 + TypeScript
 - Tailwind CSS 3
-- Shiki for syntax highlighting
+- node-pty (interactive terminal sessions)
+- xterm.js (terminal renderer)
+- react-markdown (chat rendering)

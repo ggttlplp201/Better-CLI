@@ -2,11 +2,11 @@
 
 A native macOS desktop app that wraps the Claude Code CLI in a proper UI. Three-panel layout with a session sidebar, chat area, and live tool call viewer. Includes a full interactive terminal tab for auth, config, and permission flows.
 
-<img width="1271" height="922" alt="Screenshot 2026-05-14 at 11 00 00 AM" src="https://github.com/user-attachments/assets/6578c748-5f55-46ae-8799-e1c0af2c952e" />
-
 ## Features
 
 - **Chat tab** — structured Markdown rendering, streaming responses, tool call panel, persisted session history
+<img width="1512" height="909" alt="Screenshot 2026-05-15 at 4 19 57 PM" src="https://github.com/user-attachments/assets/abd095a2-3637-4133-afa3-2d465b85be3b" />
+
 - **Terminal tab** — full interactive `claude` session in a real PTY (xterm.js), so auth, `/login`, `/config`, permission prompts, and any TTY-required flow work exactly as in a native terminal
 - Multiple named sessions with status indicators and per-session working directory
 - Slash command autocomplete popup (`/`) covering built-in, Codex, and Ruflo plugin commands
@@ -14,6 +14,7 @@ A native macOS desktop app that wraps the Claude Code CLI in a proper UI. Three-
 - Stop button to interrupt mid-response
 - macOS native title bar with traffic light buttons
 - Sessions and chat history persisted across restarts
+<img width="1512" height="912" alt="Screenshot 2026-05-15 at 4 20 14 PM" src="https://github.com/user-attachments/assets/bb24e1df-b6a0-4f5b-a25c-4b3e34e74b96" />
 
 ## How it works
 
